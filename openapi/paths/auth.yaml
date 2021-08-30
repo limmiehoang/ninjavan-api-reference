@@ -1,0 +1,39 @@
+post:
+  tags:
+    - Xác thực
+  summary: Tạo access token
+  description: |
+    Tạo access token
+  operationId: token
+  responses:
+    '200':
+      description: Tạo access token thành công
+      headers:
+        x-nv-request-id:
+          description: Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja Van devsupport.
+          schema:
+            type: string
+            format: uuid
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              access_token:
+                type: string
+                description: OAuth Bearer access token to be included in the `Authorization` HTTP header for all API requests.
+              expires:
+                type: integer
+                format: int32
+                minimum: 1
+                description: The epoch timestamp at which the access token will expire.
+              expires_in:
+                type: integer
+                format: int32
+                description: The number of seconds at which the access token will expire in.
+                minimum: 300
+              token_type:
+                type: string
+                enum:
+                  - bearer
+              

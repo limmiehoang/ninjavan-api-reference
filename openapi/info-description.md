@@ -1,37 +1,28 @@
-This is an **example** API to demonstrate features of the OpenAPI specification.
+# Giới thiệu
 
-# Introduction
+Order API là RESTful API phục vụ cho việc tạo đơn đặt hàng với Ninja Van, và các thao tác khác như in nhãn đơn hàng hay huỷ đơn hàng.
 
-This API definition is intended to to be a good starting point for
-describing your API in 
+#### Những lưu ý trong việc tích hợp API
 
-[OpenAPI/Swagger
-format](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md).
+* Hãy cache access token.
 
-It also demonstrates features of the
-[create-openapi-repo](https://github.com/Redocly/create-openapi-repo) tool
-and 
+* Khi gặp lỗi ***HTTP 500***, có thể retry yêu cầu tạo đơn hàng.
 
-the [Redoc](https://github.com/Redocly/Redoc) documentation engine. Beyond
-the standard OpenAPI syntax, we use a few 
+* Khi gặp lỗi ***HTTP 4xx***, hãy log response để debug.
+    * ***Không được*** retry cùng một request tạo đơn hàng khi chưa sửa lỗi được mô tả trong response.
 
-[vendor
-extensions](https://github.com/Redocly/Redoc/blob/master/docs/redoc-vendor-extensions.md).
+# Cấu hình chung
+
+## Môi trường
+
+| Môi trường | URL |
+|-------------|----------|
+| Production  | https://api.ninjavan.co/vn |
+| Sandbox     | https://api-sandbox.ninjavan.co/sg |
+
+# Webhooks
+
+Ninja Van cung cấp webhook API dưới dạng ***PUSH*** để cập nhật trạng thái đơn hàng. 
 
 
-# OpenAPI Specification
-
-The goal of The OpenAPI Specification is to define a standard,
-language-agnostic interface to REST APIs which
-
-allows both humans and computers to discover and understand the capabilities
-of the service without access to source
-
-code, documentation, or through network traffic inspection. When properly
-defined via OpenAPI, a consumer can 
-
-understand and interact with the remote service with a minimal amount of
-implementation logic. Similar to what
-
-interfaces have done for lower-level programming, OpenAPI removes the
-guesswork in calling the service.
+Hiện nay, Ninja Van chưa hỗ trợ API để ***PULL*** trạng thái.

@@ -1,0 +1,42 @@
+post:
+  tags:
+    - Đơn hàng
+  summary: Tạo đơn hàng (v4.1 - latest)
+  description: |
+    Gửi yêu cầu tạo đơn đến Ninja Van thông qua API. Sau khi đơn hàng được tạo thành công, hệ thống sẽ trả về tất cả thông tin tương ứng của đơn hàng.
+    
+    Để tránh đơn bị trùng mã, hãy gửi kèm `requested_tracking_number` trong payload, hệ thống sẽ sử dụng trường này để sinh mã vận đơn.
+    
+    Nếu tài khoản đối tác được cấu hình *prefixless* (không chứa prefix) cho mã vận đơn thì trường `requested_tracking_number` là **bắt buộc**.
+  operationId: order
+  parameters:
+    - name: Authorization
+      in: header
+      required: true
+      schema:
+        type: string
+        example: Bearer <ACCESS_TOKEN>
+      description: Gửi kèm access token được tạo ra từ API xác thực vào Authorization header.
+  responses:
+    '200':
+      description: Đơn hàng tạo thành công.
+      headers:
+        x-nv-request-id:
+          description: Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja Van devsupport.
+          schema:
+            type: string
+            format: uuid
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/Order.yaml
+    '401':
+      description: Xác thực không thành công.
+
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: ../components/schemas/Order.yaml
+    description: Mô tả request body
+    required: true

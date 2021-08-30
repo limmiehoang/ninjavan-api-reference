@@ -1,54 +1,25 @@
 openapi: 3.0.3
 info:
-  version: 1.0.0
-  title: Example.com
+  version: 4.1.0
+  title: Order API
   termsOfService: 'https://example.com/terms/'
-  contact:
-    email: contact@example.com
-    url: 'http://example.com/contact'
   license:
-    name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    name: Ninja Van
+    url: https://www.ninjavan.co/vi-vn/
+  contact:
+    email: devsupport@ninjavan.co
   x-logo:
-    url: 'https://redocly.github.io/openapi-template/logo.png'
+    url: 'https://images.ctfassets.net/iu7xhxelvu8m/6LC1QNfA1NyDGfp8sBN0gK/ef728c17096218198e06e1a3d990804b/nv-logo-top-sg.svg'
   description:
     $ref: ./info-description.md
 externalDocs:
-  description: Find out how to create a GitHub repo for your OpenAPI definition.
-  url: 'https://github.com/Rebilly/generator-openapi-repo'
-tags:
-  - name: Echo
-    description: Example echo operations.
-  - name: User
-    description: Operations about users.
-  - name: Tag
-    description: This is a tag description.
+  description: Tài liệu API phiên bản tiếng Anh
+  url: 'https://ninjaorderapibeta.docs.apiary.io/'
 servers:
-  - url: 'http://example.com/api/v1'
-  - url: 'https://example.com/api/v1'
+  - url: 'https://api-sandbox.ninjavan.co/sg'
+  - url: 'https://api.ninjavan.co/vn'
 paths:
-  '/users/{username}':
-    $ref: 'paths/users@{username}.yaml'
-  /echo:
-    $ref: paths/echo.yaml
-  /pathItem:
-    $ref: paths/path-item.yaml
-  /pathItemWithExamples:
-    $ref: paths/path-item-with-examples.yaml
-components:
-  securitySchemes:
-    main_auth:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: 'http://example.com/api/oauth/dialog'
-          scopes:
-            'read:users': read users info
-            'write:users': modify or remove users
-    api_key:
-      type: apiKey
-      in: header
-      name: api_key
-    basic_auth:
-      type: http
-      scheme: basic
+  '/2.0/oauth/access_token':
+    $ref: paths/auth.yaml
+  '/4.1/orders':
+    $ref: paths/order.yaml

@@ -1,0 +1,35 @@
+type: object
+description: |
+  Thông tin khung thời gian.
+
+
+  Khung thời gian hợp lệ:
+
+    * "09:00" - "12:00"
+    * "09:00" - "18:00"
+    * "09:00" - "22:00"
+    * "12:00" - "15:00"
+    * "15:00" - "18:00"
+    * "18:00" - "22:00"
+required:
+  - start_time
+  - end_time
+properties:
+  start_time:
+    type: string
+    pattern: '^([0-1][0-9]|2[0-3]):[0-5][0-9]$'
+  end_time:
+    type: string
+    pattern: '^([0-1][0-9]|2[0-3]):[0-5][0-9]$'
+  timezone:
+    type: string
+    enum:
+      - Asia/Singapore
+      - Asia/Kuala_Lumpur
+      - Asia/Jakarta
+      - Asia/Jayapura
+      - Asia/Makassar
+      - Asia/Bangkok
+      - Asia/Manila
+      - Asia/Ho_Chi_Minh
+      - Asia/Yangon
