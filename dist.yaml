@@ -1,0 +1,601 @@
+openapi: 3.0.3
+info:
+  version: 4.1.0
+  title: Order API
+  termsOfService: 'https://example.com/terms/'
+  license:
+    name: Ninja Van
+    url: 'https://www.ninjavan.co/vi-vn/'
+  contact:
+    email: devsupport@ninjavan.co
+  x-logo:
+    url: >-
+      https://images.ctfassets.net/iu7xhxelvu8m/6LC1QNfA1NyDGfp8sBN0gK/ef728c17096218198e06e1a3d990804b/nv-logo-top-sg.svg
+  description: >
+    # Giới thiệu
+
+
+    Order API là RESTful API phục vụ cho việc tạo đơn đặt hàng với Ninja Van, và
+    các thao tác khác như in nhãn đơn hàng hay huỷ đơn hàng.
+
+
+    #### Những lưu ý trong việc tích hợp API
+
+
+    * Hãy cache access token.
+
+
+    * Khi gặp lỗi ***HTTP 500***, có thể retry yêu cầu tạo đơn hàng.
+
+
+    * Khi gặp lỗi ***HTTP 4xx***, hãy log response để debug.
+        * ***Không được*** retry cùng một request tạo đơn hàng khi chưa sửa lỗi được mô tả trong response.
+
+    # Cấu hình chung
+
+
+    ## Môi trường
+
+
+    | Môi trường | URL |
+
+    |-------------|----------|
+
+    | Production  | https://api.ninjavan.co/vn |
+
+    | Sandbox     | https://api-sandbox.ninjavan.co/sg |
+
+
+    # Webhooks
+
+
+    Ninja Van cung cấp webhook API dưới dạng ***PUSH*** để cập nhật trạng thái
+    đơn hàng. 
+
+
+
+    Hiện nay, Ninja Van chưa hỗ trợ API để ***PULL*** trạng thái.
+externalDocs:
+  description: Tài liệu API phiên bản tiếng Anh
+  url: 'https://ninjaorderapibeta.docs.apiary.io/'
+servers:
+  - url: 'https://api-sandbox.ninjavan.co/sg'
+  - url: 'https://api.ninjavan.co/vn'
+paths:
+  /2.0/oauth/access_token:
+    post:
+      tags:
+        - Xác thực
+      summary: Tạo access token
+      description: |
+        Tạo access token
+      operationId: token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - client_id
+                - client_secret
+                - grant_type
+              properties:
+                client_id:
+                  type: string
+                  description: Client ID
+                client_secret:
+                  type: string
+                  description: Client Key
+                grant_type:
+                  type: string
+                  enum:
+                    - client_credentials
+              example:
+                client_id: A6o3JIBDKtxko7dU9PYl4YJeYrhxfq6f
+                client_secret: PqDdeoR3NrHIObZkinoI22j79fBCPeVs
+                grant_type: client_credentials
+        required: true
+      responses:
+        '200':
+          description: Tạo access token thành công.
+          headers:
+            x-nv-request-id:
+              description: >-
+                Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja
+                Van devsupport.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    description: >-
+                      OAuth Bearer access token dùng để gửi kèm trong
+                      `Authorization` HTTP header cho mọi API request.
+                  expires:
+                    type: integer
+                    format: int32
+                    minimum: 1
+                    description: Mốc thời gian mà access token hết hạn.
+                  expires_in:
+                    type: integer
+                    format: int32
+                    description: Thời hạn (số giây còn lại) của mã access token.
+                    minimum: 300
+                  token_type:
+                    type: string
+                    enum:
+                      - bearer
+                example:
+                  access_token: FrNwYvHrsu26lhuBebjbJo7fKj9lWyfd
+                  expires: 1630369629
+                  expires_in: 43200
+                  token_type: bearer
+  /4.1/orders:
+    post:
+      tags:
+        - Đơn hàng
+      summary: Tạo đơn hàng (v4.1 - latest)
+      description: >
+        Gửi yêu cầu tạo đơn đến Ninja Van thông qua API. Sau khi đơn hàng được
+        tạo thành công, hệ thống sẽ trả về tất cả thông tin tương ứng của đơn
+        hàng.
+
+
+        Để tránh đơn bị trùng mã, hãy gửi kèm `requested_tracking_number` trong
+        payload, hệ thống sẽ sử dụng trường này để sinh mã vận đơn.
+
+
+        Nếu tài khoản đối tác được cấu hình *prefixless* (không chứa prefix) cho
+        mã vận đơn thì trường `requested_tracking_number` là **bắt buộc**.
+      operationId: order
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: Bearer <ACCESS_TOKEN>
+          description: >-
+            Gửi kèm access token được tạo ra từ API xác thực vào Authorization
+            header.
+      responses:
+        '200':
+          description: Đơn hàng tạo thành công.
+          headers:
+            x-nv-request-id:
+              description: >-
+                Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja
+                Van devsupport.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          description: Xác thực không thành công.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+components:
+  schemas:
+    Address:
+      type: object
+      required:
+        - name
+        - phone_number
+        - email
+        - address
+      properties:
+        name:
+          type: string
+          description: |
+            Tên người liên hệ. 
+          minLength: 3
+          maxLength: 255
+        phone_number:
+          type: string
+          description: |
+            Số điện thoại liên hệ. 
+
+            Hệ thống chỉ yêu cầu truyền `email` hoặc `phone_number`.
+          maxLength: 32
+          minLength: 6
+          example: +65 98761234
+        email:
+          type: string
+          description: |
+            Email liên hệ.
+
+            Hệ thống chỉ yêu cầu truyền `email` hoặc `phone_number`.
+          format: email
+          example: john.doe@mail.com
+        address:
+          type: object
+          required:
+            - address1
+            - country
+          properties:
+            address1:
+              type: string
+              description: |
+                Tên toà nhà + Số nhà + Đường phố.
+            address2:
+              type: string
+              description: |
+                Địa chỉ thay thế.
+            country:
+              type: string
+              description: |
+                Đối với Việt Nam, hãy truyền `VN`.
+              enum:
+                - SG
+                - MY
+                - TH
+                - ID
+                - VN
+                - PH
+                - MM
+              example: VN
+            latitude:
+              type: number
+              description: |
+                Vĩ độ.
+              format: double
+              minimum: -90
+              maximum: 90
+            longitude:
+              type: number
+              description: |
+                Kinh độ.
+              format: double
+              minimum: -180
+              maximum: 180
+            address_type:
+              type: string
+              example: office
+              enum:
+                - home
+                - office
+              description: |
+                Loại địa chỉ.
+          allOf:
+            - type: object
+              description: Thông tin địa chỉ.
+              properties:
+                ward:
+                  type: string
+                  description: Xã/Phường.
+                district:
+                  type: string
+                  description: Quận/Huyện.
+                city:
+                  type: string
+                  description: Tỉnh/Thành phố.
+    Timeslot:
+      type: object
+      description: |
+        Thông tin khung thời gian.
+
+
+        Khung thời gian hợp lệ:
+
+          * "09:00" - "12:00"
+          * "09:00" - "18:00"
+          * "09:00" - "22:00"
+          * "12:00" - "15:00"
+          * "15:00" - "18:00"
+          * "18:00" - "22:00"
+      required:
+        - start_time
+        - end_time
+      properties:
+        start_time:
+          type: string
+          pattern: '^([0-1][0-9]|2[0-3]):[0-5][0-9]$'
+        end_time:
+          type: string
+          pattern: '^([0-1][0-9]|2[0-3]):[0-5][0-9]$'
+        timezone:
+          type: string
+          enum:
+            - Asia/Singapore
+            - Asia/Kuala_Lumpur
+            - Asia/Jakarta
+            - Asia/Jayapura
+            - Asia/Makassar
+            - Asia/Bangkok
+            - Asia/Manila
+            - Asia/Ho_Chi_Minh
+            - Asia/Yangon
+    Order:
+      type: object
+      required:
+        - service_type
+        - service_level
+        - from
+        - to
+      properties:
+        service_type:
+          type: string
+          description: >
+            Dùng để thông báo cho Ninjavan biết những công việc cần làm cho đơn
+            hàng này.
+
+
+            ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja
+            Van để biết bạn dùng Service Type nào.
+          enum:
+            - Parcel
+            - Document
+            - Return
+            - Marketplace
+            - Corporate
+            - Corporate Document
+            - Bulky
+            - International
+        service_level:
+          type: string
+          description: >
+            Dịch vụ vận chuyển.
+
+
+            ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja
+            Van để biết bạn dùng Service Level nào.
+          enum:
+            - Standard
+            - Express
+            - Sameday
+            - Nextday
+        requested_tracking_number:
+          type: string
+          pattern: '^([a-zA-Z0-9]+[-])*[a-zA-Z0-9]+$'
+          minLength: 9
+          description: Mã đơn hàng được yêu cầu.
+        reference:
+          type: object
+          description: >
+            Thông tin tham chiếu. Thông tin này sẽ được gửi kèm trong webhooks,
+            và có thể được sử dụng làm tham số cho GET API của Ninja Van.
+          properties:
+            merchant_order_number:
+              type: string
+              description: Định danh đơn hàng trên hệ thống đối tác.
+              maxLength: 255
+        from:
+          type: object
+          description: |
+            Đối tượng `from` được dùng như:
+
+            * Thông tin liên hệ để thông báo người gửi khi có cập nhật đơn hàng
+
+            * Thông tin địa chỉ gửi hàng in trên nhãn bưu kiện
+          allOf:
+            - $ref: '#/components/schemas/Address'
+        to:
+          type: object
+          description: |
+            Đối tượng `to` được dùng như nơi giao hàng và:
+
+            * Thông tin liên hệ để thông báo người nhận khi có cập nhật đơn hàng
+
+            * Thông tin địa chỉ giao hàng in trên nhãn bưu kiện
+          allOf:
+            - $ref: '#/components/schemas/Address'
+        parcel_job:
+          type: object
+          description: >-
+            Chi tiết thông tin nhận hàng và giao hàng.
+
+
+            Nếu địa chỉ nhận hàng không được gửi lên, hệ thống sẽ dựa vào địa
+            chỉ nhận hàng mặc định được cài đặt trong pickup reservation của đối
+            tác.
+          required:
+            - is_pickup_required
+            - delivery_timeslot
+            - delivery_start_date
+          properties:
+            is_pickup_required:
+              type: boolean
+              description: |
+                Cho biết có cần pickup tại kho của đối tác hay không.
+              default: false
+            pickup_address:
+              type: object
+              description: |
+                Địa chỉ nhận hàng.
+              allOf:
+                - $ref: '#/components/schemas/Address'
+            pickup_address_id:
+              type: string
+              pattern: '^([a-zA-Z0-9]+[-])*[a-zA-Z0-9]+$'
+              description: |
+                Dùng mã địa chỉ nhận hàng đã được lưu trong hệ thống Ninja Van.
+              minLength: 1
+              maxLength: 64
+            pickup_service_type:
+              type: string
+              enum:
+                - Scheduled
+                - On-Demand
+              default: Scheduled
+              description: >
+                Dịch vụ nhận hàng.
+
+
+                ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của
+                Ninja Van để biết bạn dùng Pickup Service Type nào.
+            pickup_service_level:
+              type: string
+              enum:
+                - Standard
+                - Premium
+              default: Standard
+              description: >
+                ***Lưu ý:*** Không áp dụng cho các đơn hàng có dịch vụ pickup
+                `On-Demand`.
+            pickup_date:
+              type: string
+              pattern: '^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'
+              description: |
+                Ngày nhận hàng từ đối tác, định dạng `yyyy-MM-dd`.
+            pickup_timeslot:
+              type: object
+              description: |
+                Khung thời gian nhận hàng.
+
+                ***Lưu ý:*** Các khung giờ hợp lệ:
+
+                * "09:00" - "12:00"
+
+                * "09:00" - "18:00"
+
+                * "09:00" - "22:00"
+
+                * "12:00" - "15:00"
+
+                * "15:00" - "18:00"
+
+                * "18:00" - "22:00"
+              allOf:
+                - $ref: '#/components/schemas/Timeslot'
+            pickup_approx_volume:
+              type: string
+              enum:
+                - Full-Van Load
+                - Half-Van Load
+                - Larger than Van Load
+                - Less than 10 Parcels
+                - Less than 3 Parcels
+                - Trolley Required
+              default: Less than 3 Parcels
+            pickup_instructions:
+              type: string
+              description: |
+                Hướng dẫn cho tài xế đến nhận hàng.
+            delivery_start_date:
+              type: string
+              pattern: '^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'
+              description: >
+                Ngày bắt đầu của khoảng thời gian giao hàng, định dạng
+                `yyyy-MM-dd`.
+
+
+                Ví dụ: Đối với các đơn đặt hàng tiêu chuẩn mất 3 ngày, nếu
+
+                `delivery_start_date` là vào `2017-02-10`, Ninja Van sẽ
+
+                cố gắng giao hàng trong khoảng thời gian từ `2017-02-10` đến
+                `2017-02-12`.
+
+
+                Hệ thống sẽ tự động điều chỉnh thành ngày khả dụng gần nhất khi
+                ngày được truyền vào không hợp lệ (cuối tuần hoặc ngày lễ). Hãy
+                kiểm tra ngày `delivery_start_date` trong kết quả trả về.
+            delivery_timeslot:
+              type: object
+              description: |
+                Khung thời gian giao hàng.
+
+                ***Lưu ý:*** Các khung giờ hợp lệ:
+
+                * "09:00" - "12:00"
+
+                * "09:00" - "18:00"
+
+                * "09:00" - "22:00"
+
+                * "12:00" - "15:00"
+
+                * "15:00" - "18:00"
+
+                * "18:00" - "22:00"
+              allOf:
+                - $ref: '#/components/schemas/Timeslot'
+            delivery_instructions:
+              type: string
+              description: |
+                Hướng dẫn cho tài xế đi giao hàng.
+            items:
+              type: array
+              items:
+                type: object
+            allow_weekend_delivery:
+              type: boolean
+              default: true
+              description: |
+                Cho biết có nên giao hàng vào cuối tuần hay không.
+            cash_on_delivery:
+              type: number
+              format: double
+              minimum: 0
+              description: |
+                Số tiền COD. Nếu bằng 0 thì không thu tiền COD.
+            insured_value:
+              type: number
+              format: double
+              minimum: 0
+              description: |
+                Giá trị bảo hiểm mong muốn của kiện hàng.
+            dimensions:
+              type: object
+              description: >
+                Kích thước của kiện hàng, được dùng để tính phí vận chuyển.
+
+
+
+                ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của
+                Ninja Van để xem bạn nên gửi thuộc tính kích thước nào.
+      example:
+        service_type: Parcel
+        service_level: Standard
+        requested_tracking_number: 1234-56789
+        reference:
+          merchant_order_number: SHIP-1234-56789
+        from:
+          name: Nguyễn Văn Quang
+          phone_number: '+84702222222'
+          email: quang.nguyen@gmail.com
+          address:
+            address1: 120 Nguyễn Thị Minh Khai
+            ward: Phường 6
+            district: Quận 3
+            city: Hồ Chí Minh
+            country: VN
+        to:
+          name: Trần Thị Như Thảo
+          phone_number: '+84702333333'
+          email: thao.tran@gmail.com
+          address:
+            address1: 66 Nguyễn Thái Học
+            address2: Bảo tàng Mỹ thuật Việt Nam
+            ward: Điện Bàn
+            district: Ba Đình
+            city: Hà Nội
+            country: VN
+        parcel_job:
+          is_pickup_required: true
+          pickup_service_type: Scheduled
+          pickup_service_level: Standard
+          pickup_date: '2021-09-01'
+          pickup_timeslot:
+            start_time: '09:00'
+            end_time: '22:00'
+            timezone: Asia/Ho_Chi_Minh
+          pickup_instructions: Vui lòng gọi trước khi đến pickup!
+          delivery_start_date: '2021-09-03'
+          delivery_timeslot:
+            start_time: '09:00'
+            end_time: '22:00'
+            timezone: Asia/Ho_Chi_Minh
+          delivery_instructions: Hàng không đổi trả

@@ -5,9 +5,34 @@ post:
   description: |
     Tạo access token
   operationId: token
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - client_id
+            - client_secret
+            - grant_type
+          properties:
+            client_id:
+              type: string
+              description: Client ID
+            client_secret:
+              type: string
+              description: Client Key
+            grant_type:
+              type: string
+              enum:
+                - client_credentials
+          example: 
+            client_id: "A6o3JIBDKtxko7dU9PYl4YJeYrhxfq6f"
+            client_secret: "PqDdeoR3NrHIObZkinoI22j79fBCPeVs"
+            grant_type: "client_credentials"
+    required: true
   responses:
     '200':
-      description: Tạo access token thành công
+      description: Tạo access token thành công.
       headers:
         x-nv-request-id:
           description: Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja Van devsupport.
@@ -21,19 +46,24 @@ post:
             properties:
               access_token:
                 type: string
-                description: OAuth Bearer access token to be included in the `Authorization` HTTP header for all API requests.
+                description: OAuth Bearer access token dùng để gửi kèm trong `Authorization` HTTP header cho mọi API request.
               expires:
                 type: integer
                 format: int32
                 minimum: 1
-                description: The epoch timestamp at which the access token will expire.
+                description: Mốc thời gian mà access token hết hạn.
               expires_in:
                 type: integer
                 format: int32
-                description: The number of seconds at which the access token will expire in.
+                description: Thời hạn (số giây còn lại) của mã access token.
                 minimum: 300
               token_type:
                 type: string
                 enum:
                   - bearer
+            example: 
+              access_token: FrNwYvHrsu26lhuBebjbJo7fKj9lWyfd
+              expires: 1630369629
+              expires_in: 43200
+              token_type: bearer
               

@@ -227,36 +227,39 @@ example:
   reference:
     merchant_order_number: SHIP-1234-56789
   from:
-    name: John Doe
-    phone_number: '+60122222222'
-    email: john.doe@gmail.com
+    name: Nguyễn Văn Quang
+    phone_number: '+84702222222'
+    email: quang.nguyen@gmail.com
     address:
-      address1: 17 Lorong Jambu 3
-      address2: ''
-      area: Taman Sri Delima
-      city: Simpang Ampat
-      state: Pulau Pinang
-      
-      country: MY
-      postcode: '51200'
+      address1: 120 Nguyễn Thị Minh Khai
+      ward: Phường 6
+      district: Quận 3
+      city: Hồ Chí Minh      
+      country: VN
   to:
-    name: Jane Doe
-    phone_number: '+6212222222222'
-    email: jane.doe@gmail.com
+    name: Trần Thị Như Thảo
+    phone_number: '+84702333333'
+    email: thao.tran@gmail.com
     address:
-      address1: Gedung Balaikota DKI Jakarta
-      address2: Jalan Medan Merdeka Selatan No. 10
-      kelurahan: Kelurahan Gambir
-      kecamatan: Kecamatan Gambir
-      city: Jakarta Selatan
-      province: Jakarta
-      country: ID
-      postcode: '10110'
+      address1: 66 Nguyễn Thái Học
+      address2: Bảo tàng Mỹ thuật Việt Nam
+      ward: Điện Bàn
+      district: Ba Đình
+      city: Hà Nội
+      country: VN
   parcel_job:
-    pickup_instructions: Pickup with care!
-    delivery_instructions: If recipient is not around, leave parcel in power riser.
-    delivery_start_date: 2017-01-20
+    is_pickup_required: true
+    pickup_service_type: Scheduled
+    pickup_service_level: Standard
+    pickup_date: '2021-09-01'
+    pickup_timeslot:
+      start_time: '09:00'
+      end_time: '22:00'
+      timezone: Asia/Ho_Chi_Minh
+    pickup_instructions: Vui lòng gọi trước khi đến pickup!
+    delivery_start_date: '2021-09-03'
     delivery_timeslot: 
       start_time: '09:00'
       end_time: '22:00'
-      timezone: Asia/Singapore
+      timezone: Asia/Ho_Chi_Minh
+    delivery_instructions: Hàng không đổi trả

@@ -38,5 +38,4 @@ post:
       application/json:
         schema:
           $ref: ../components/schemas/Order.yaml
-    description: Mô tả request body
     required: true
