@@ -4,12 +4,12 @@ Order API là RESTful API phục vụ cho việc tạo đơn đặt hàng với 
 
 #### Những lưu ý trong việc tích hợp API
 
-* Hãy cache access token.
+* Vui lòng lưu access token vào database
 
-* Khi gặp lỗi ***HTTP 500***, có thể retry yêu cầu tạo đơn hàng.
+* Khi gặp lỗi ***HTTP 500***, bạn có thể retry yêu cầu tạo đơn hàng
 
-* Khi gặp lỗi ***HTTP 4xx***, hãy log response để debug.
-    * ***Không được*** retry cùng một request tạo đơn hàng khi chưa sửa lỗi được mô tả trong response.
+* Khi gặp lỗi ***HTTP 4xx***, hãy lưu lại kết quả trả về để debug
+    * ***Không được*** retry cùng một yêu cầu tạo đơn hàng khi chưa sửa lỗi mô tả trong kết quả trả về
 
 # Cấu hình chung
 

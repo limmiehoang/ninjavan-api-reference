@@ -8,8 +8,8 @@ properties:
   service_type:
     type: string
     description: |
-      Dùng để thông báo cho Ninjavan biết những công việc cần làm cho đơn hàng này.
-      
+      Loại hình dịch vụ của đối tác
+
       ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja Van để biết bạn dùng Service Type nào.
     enum:
       - Parcel
@@ -23,8 +23,8 @@ properties:
   service_level:
     type: string
     description: |
-      Dịch vụ vận chuyển.
-    
+      Dịch vụ vận chuyển mong muốn
+
       ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja Van để biết bạn dùng Service Level nào.
     enum:
       - Standard
@@ -35,15 +35,15 @@ properties:
     type: string
     pattern: '^([a-zA-Z0-9]+[-])*[a-zA-Z0-9]+$'
     minLength: 9
-    description: Mã đơn hàng được yêu cầu.
+    description: Mã đơn hàng mong muốn
   reference:
     type: object
     description: |
-      Thông tin tham chiếu. Thông tin này sẽ được gửi kèm trong webhooks, và có thể được sử dụng làm tham số cho GET API của Ninja Van.
+      Thông tin tham chiếu, được bao gồm trong webhooks để đối chiếu với đơn hàng trên hệ thống đối tác, và có thể dùng làm tham số cho các GET API của Ninja Van.
     properties:
       merchant_order_number:
         type: string
-        description: Định danh đơn hàng trên hệ thống đối tác.
+        description: Định danh đơn hàng trên hệ thống đối tác
         maxLength: 255
   from:
     type: object
@@ -87,14 +87,14 @@ properties:
       pickup_address:
         type: object
         description: |
-          Địa chỉ nhận hàng.
+          Địa chỉ nhận hàng
         allOf:
           - $ref: './Address.yaml'
       pickup_address_id:    
         type: string
         pattern: '^([a-zA-Z0-9]+[-])*[a-zA-Z0-9]+$'
         description: |
-          Dùng mã địa chỉ nhận hàng đã được lưu trong hệ thống Ninja Van.
+          Mã địa chỉ nhận hàng đã được lưu trong hệ thống Ninja Van
         minLength: 1  
         maxLength: 64
       pickup_service_type:
@@ -105,7 +105,7 @@ properties:
         default:
           Scheduled
         description: |
-          Dịch vụ nhận hàng.
+          Dịch vụ lấy hàng
           
           ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja Van để biết bạn dùng Pickup Service Type nào.
       pickup_service_level:
@@ -125,9 +125,9 @@ properties:
       pickup_timeslot:
         type: object
         description: |
-          Khung thời gian nhận hàng.
+          Khung thời gian nhận hàng
 
-          ***Lưu ý:*** Các khung giờ hợp lệ:
+          ***Lưu ý:*** Các khung giờ hợp lệ
     
           * "09:00" - "12:00"
           
@@ -156,7 +156,7 @@ properties:
       pickup_instructions:
         type: string
         description: |
-          Hướng dẫn cho tài xế đến nhận hàng.
+          Hướng dẫn cho tài xế đến lấy hàng
       delivery_start_date:
         type: string
         pattern: '^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'
@@ -171,9 +171,9 @@ properties:
       delivery_timeslot:
         type: object
         description: |
-          Khung thời gian giao hàng.
+          Khung thời gian giao hàng
 
-          ***Lưu ý:*** Các khung giờ hợp lệ:
+          ***Lưu ý:*** Các khung giờ hợp lệ
     
           * "09:00" - "12:00"
           
@@ -191,7 +191,7 @@ properties:
       delivery_instructions:
         type: string
         description: |
-          Hướng dẫn cho tài xế đi giao hàng.
+          Hướng dẫn cho tài xế đi giao hàng
       items:
         type: array
         items:
@@ -212,7 +212,7 @@ properties:
         format: double
         minimum: 0
         description: |
-          Giá trị bảo hiểm mong muốn của kiện hàng.
+          Giá trị bảo hiểm mong muốn của kiện hàng
       dimensions:
         type: object
         description: |

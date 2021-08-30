@@ -1,9 +1,9 @@
 type: object
 description: |
-  Thông tin khung thời gian.
+  Thông tin khung thời gian
 
 
-  Khung thời gian hợp lệ:
+  Khung thời gian hợp lệ
 
     * "09:00" - "12:00"
     * "09:00" - "18:00"

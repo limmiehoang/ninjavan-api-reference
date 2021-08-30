@@ -1,9 +1,7 @@
 post:
   tags:
-    - Xác thực
-  summary: Tạo access token
-  description: |
-    Tạo access token
+    - Xác thực tài khoản
+  summary: Tạo mã xác thực
   operationId: token
   requestBody:
     content:
@@ -32,7 +30,7 @@ post:
     required: true
   responses:
     '200':
-      description: Tạo access token thành công.
+      description: Tạo mã xác thực thành công
       headers:
         x-nv-request-id:
           description: Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja Van devsupport.
@@ -46,7 +44,7 @@ post:
             properties:
               access_token:
                 type: string
-                description: OAuth Bearer access token dùng để gửi kèm trong `Authorization` HTTP header cho mọi API request.
+                description: Bearer access token dùng để gửi kèm trong `Authorization` HTTP header cho mọi API request.
               expires:
                 type: integer
                 format: int32

@@ -8,13 +8,13 @@ properties:
   name:
     type: string
     description: |
-      Tên người liên hệ. 
+      Tên người liên hệ
     minLength: 3
     maxLength: 255
   phone_number:
     type: string
     description: |
-      Số điện thoại liên hệ. 
+      Số điện thoại liên hệ
 
       Hệ thống chỉ yêu cầu truyền `email` hoặc `phone_number`.
     maxLength: 32
@@ -23,7 +23,7 @@ properties:
   email:
     type: string
     description: |
-      Email liên hệ.
+      Email liên hệ
    
       Hệ thống chỉ yêu cầu truyền `email` hoặc `phone_number`.
     format: email
@@ -37,14 +37,16 @@ properties:
       address1:
         type: string
         description: |
-          Tên toà nhà + Số nhà + Đường phố.
+          Tên toà nhà + Số nhà + Đường phố
       address2:
         type: string
         description: |
-          Địa chỉ thay thế.
+          Địa chỉ thay thế
       country:
         type: string
         description: |
+          Quốc gia
+          
           Đối với Việt Nam, hãy truyền `VN`.
         enum:
           - SG
@@ -58,14 +60,14 @@ properties:
       latitude:
         type: number
         description: |
-          Vĩ độ.
+          Vĩ độ
         format: double
         minimum: -90
         maximum: 90
       longitude:
         type: number
         description: |
-          Kinh độ.
+          Kinh độ
         format: double
         minimum: -180
         maximum: 180
@@ -76,17 +78,17 @@ properties:
           - home
           - office
         description: |
-          Loại địa chỉ.
+          Loại địa chỉ
     allOf:
       - type: object
-        description: Thông tin địa chỉ.
+        description: Thông tin địa chỉ
         properties:
           ward:
             type: string
-            description: Xã/Phường.
+            description: Xã/Phường
           district:
             type: string
-            description: Quận/Huyện.
+            description: Quận/Huyện
           city:
             type: string
-            description: Tỉnh/Thành phố.
+            description: Tỉnh/Thành phố

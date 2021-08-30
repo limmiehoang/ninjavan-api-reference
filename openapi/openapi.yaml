@@ -13,7 +13,7 @@ info:
   description:
     $ref: ./info-description.md
 externalDocs:
-  description: Tài liệu API phiên bản tiếng Anh
+  description: API docs (English version)
   url: 'https://ninjaorderapibeta.docs.apiary.io/'
 servers:
   - url: 'https://api-sandbox.ninjavan.co/sg'

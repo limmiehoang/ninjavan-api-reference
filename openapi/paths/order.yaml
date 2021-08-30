@@ -1,6 +1,6 @@
 post:
   tags:
-    - Đơn hàng
+    - Thao tác với đơn hàng
   summary: Tạo đơn hàng (v4.1 - latest)
   description: |
     Gửi yêu cầu tạo đơn đến Ninja Van thông qua API. Sau khi đơn hàng được tạo thành công, hệ thống sẽ trả về tất cả thông tin tương ứng của đơn hàng.
@@ -15,11 +15,11 @@ post:
       required: true
       schema:
         type: string
-        example: Bearer <ACCESS_TOKEN>
-      description: Gửi kèm access token được tạo ra từ API xác thực vào Authorization header.
+        example: Bearer <YOUR_ACCESS_TOKEN>
+      description: Xác thực bằng cách gửi kèm mã `access_token` được trả về trong API tạo mã xác thực.
   responses:
     '200':
-      description: Đơn hàng tạo thành công.
+      description: Đơn hàng tạo thành công
       headers:
         x-nv-request-id:
           description: Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja Van devsupport.
@@ -29,10 +29,31 @@ post:
       content:
         application/json:
           schema:
-            $ref: ../components/schemas/Order.yaml
+            $ref: ../components/schemas/OrderResponse.yaml
     '401':
-      description: Xác thực không thành công.
-
+      description: Mã xác thực không hợp lệ
+      headers:
+        x-nv-request-id:
+          description: Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja Van devsupport.
+          schema:
+            type: string
+            format: uuid
+    '400':
+      description: Yêu cầu bị từ chối do tham số gửi lên không hợp lệ
+      headers:
+        x-nv-request-id:
+          description: Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja Van devsupport.
+          schema:
+            type: string
+            format: uuid
+    '500':
+      description: Tạo đơn hàng không thành công do lỗi từ server
+      headers:
+        x-nv-request-id:
+          description: Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja Van devsupport.
+          schema:
+            type: string
+            format: uuid
   requestBody:
     content:
       application/json:
