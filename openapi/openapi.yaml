@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   version: 4.1.0
-  title: Order API
+  title: NinjaVan Order API
   termsOfService: 'https://example.com/terms/'
   license:
     name: Ninja Van
@@ -10,14 +10,26 @@ info:
     email: devsupport@ninjavan.co
   x-logo:
     url: 'https://images.ctfassets.net/iu7xhxelvu8m/6LC1QNfA1NyDGfp8sBN0gK/ef728c17096218198e06e1a3d990804b/nv-logo-top-sg.svg'
+    backgroundColor: '#ffffff'
+    altText: Ninja Van
   description:
     $ref: ./info-description.md
 externalDocs:
   description: API docs (English version)
   url: 'https://ninjaorderapibeta.docs.apiary.io/'
 servers:
-  - url: 'https://api-sandbox.ninjavan.co/sg'
-  - url: 'https://api.ninjavan.co/vn'
+  - url: 'https://api-sandbox.ninjavan.co/SG'
+    description: Môi trường thử nghiệm
+  - url: 'https://api.ninjavan.co/VN'
+    description: Môi trường thật
+tags:
+  - name: APIs
+    description: Các API liên quan đến việc tạo đơn đặt hàng
+  - name: Webhooks
+    description: |
+      Ninja Van cung cấp webhook dưới dạng ***PUSH*** để cập nhật trạng thái đơn hàng.
+      
+      Hiện nay Ninja Van chưa hỗ trợ API để ***PULL*** trạng thái.
 paths:
   '/2.0/oauth/access_token':
     $ref: paths/auth.yaml

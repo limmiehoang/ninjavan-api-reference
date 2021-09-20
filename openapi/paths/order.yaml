@@ -1,6 +1,6 @@
 post:
   tags:
-    - Thao tác với đơn hàng
+    - APIs
   summary: Tạo đơn hàng (v4.1 - latest)
   description: |
     Gửi yêu cầu tạo đơn đến Ninja Van thông qua API. Sau khi đơn hàng được tạo thành công, hệ thống sẽ trả về tất cả thông tin tương ứng của đơn hàng.

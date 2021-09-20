@@ -1,7 +1,11 @@
 post:
   tags:
-    - Xác thực tài khoản
+    - APIs
   summary: Tạo mã xác thực
+  description: |-
+    Yêu cầu mã xác thực Oauth Bearer mới.
+
+    Đối tác cần có mã ID và mã khoá cho yêu cầu này. Mã ID và mã khoá có thể được truy xuất từ dashboard của đối tác, trong phần cài đặt API.
   operationId: token
   requestBody:
     content:
@@ -31,25 +35,24 @@ post:
   responses:
     '200':
       description: Tạo mã xác thực thành công
-      headers:
-        x-nv-request-id:
-          description: Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja Van devsupport.
-          schema:
-            type: string
-            format: uuid
       content:
         application/json:
           schema:
             type: object
+            required:
+              - access_token
+              - expires
+              - expires_in
+              - token_type
             properties:
               access_token:
                 type: string
-                description: Bearer access token dùng để gửi kèm trong `Authorization` HTTP header cho mọi API request.
+                description: Mã xác thực dùng để gửi kèm trong `Authorization` HTTP header cho mọi API request.
               expires:
                 type: integer
                 format: int32
                 minimum: 1
-                description: Mốc thời gian mà access token hết hạn.
+                description: Mốc thời gian epoch mà access token hết hạn.
               expires_in:
                 type: integer
                 format: int32
@@ -64,4 +67,3 @@ post:
               expires: 1630369629
               expires_in: 43200
               token_type: bearer
-              
