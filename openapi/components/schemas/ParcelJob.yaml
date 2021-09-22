@@ -41,6 +41,7 @@ properties:
       Hướng dẫn cho tài xế đi giao hàng.
   items:
     type: array
+    description: Chi tiết sản phẩm bên trong kiện hàng.
     items:
       required:
         - item_description
@@ -55,7 +56,6 @@ properties:
         is_dangerous_good:
           type: boolean
           description: Khai báo hàng nguy hiểm vận chuyển hàng không
-      description: Chi tiết sản phẩm bên trong kiện hàng.
   allow_weekend_delivery:
     type: boolean
     default: true
@@ -80,6 +80,31 @@ properties:
       
       
       ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja Van để xem bạn nên gửi thuộc tính kích thước nào.
+    properties:
+      size:
+        type: string
+        enum:
+          - S
+          - M
+          - L
+          - XL
+          - XXL
+      weight:
+        type: number
+        description: Cân nặng (kg)
+        format: double
+      length:
+        type: number
+        description: Chiều dài (cm)
+        format: double
+      width:
+        type: number
+        description: Chiều rộng (cm)
+        format: double
+      height:
+        type: number
+        description: Chiều cao (cm)
+        format: double
   is_pickup_required: 
     type: boolean
     description: |
