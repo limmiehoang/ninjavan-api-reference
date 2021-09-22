@@ -4,13 +4,20 @@ required:
   - service_level
   - from
   - to
+  - parcel_job
+discriminator:
+  propertyName: service_type
+  mapping:
+    Parcel: './Parcel.yaml'
+    Marketplace: './Marketplace.yaml'
+    Corporate: './Corporate.yaml'
 properties:
   service_type:
     type: string
     description: |
-      Loại hình dịch vụ của đối tác
+      Loại hình vận chuyển, là chỉ dẫn để thông báo cho Ninja Van biết những công việc cần làm cho đơn hàng này.
 
-      ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja Van để biết bạn dùng Service Type nào.
+      ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja Van để biết bạn có thể dùng Service Type nào.
     enum:
       - Parcel
       - Document
@@ -25,7 +32,7 @@ properties:
     description: |
       Dịch vụ vận chuyển mong muốn
 
-      ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja Van để biết bạn dùng Service Level nào.
+      ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja Van để biết bạn có thể dùng Service Level nào.
     enum:
       - Standard
       - Express
@@ -39,7 +46,7 @@ properties:
   reference:
     type: object
     description: |
-      Thông tin tham chiếu, được bao gồm trong webhooks để đối chiếu với đơn hàng trên hệ thống đối tác, và có thể dùng làm tham số cho các GET API của Ninja Van.
+      Thông tin tham chiếu, thông tin này sẽ được bao gồm trong webhooks để đối chiếu với đơn hàng trên hệ thống đối tác, và có thể dùng làm tham số khi truy xuất đơn đặt hàng qua API của Ninja Van.
     properties:
       merchant_order_number:
         type: string
@@ -69,157 +76,12 @@ properties:
     
   parcel_job:
     type: object
-    description: >-
+    description: |
       Chi tiết thông tin nhận hàng và giao hàng.
 
-
-      Nếu địa chỉ nhận hàng không được gửi lên, hệ thống sẽ dựa vào địa chỉ nhận hàng mặc định được cài đặt trong pickup reservation của đối tác.
-    required:
-      - is_pickup_required
-      - delivery_timeslot
-      - delivery_start_date
-    properties:
-      is_pickup_required: 
-        type: boolean
-        description: |
-          Cho biết có cần pickup tại kho của đối tác hay không.
-        default: false
-      pickup_address:
-        type: object
-        description: |
-          Địa chỉ nhận hàng
-        allOf:
-          - $ref: './Address.yaml'
-      pickup_address_id:    
-        type: string
-        pattern: '^([a-zA-Z0-9]+[-])*[a-zA-Z0-9]+$'
-        description: |
-          Mã địa chỉ nhận hàng đã được lưu trong hệ thống Ninja Van
-        minLength: 1  
-        maxLength: 64
-      pickup_service_type:
-        type: string
-        enum:
-          - Scheduled
-          - On-Demand
-        default:
-          Scheduled
-        description: |
-          Dịch vụ lấy hàng
-          
-          ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja Van để biết bạn dùng Pickup Service Type nào.
-      pickup_service_level:
-        type: string
-        enum:
-          - Standard
-          - Premium
-        default:
-          Standard
-        description: |
-          ***Lưu ý:*** Không áp dụng cho các đơn hàng có dịch vụ pickup `On-Demand`.
-      pickup_date:
-        type: string
-        pattern: '^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'
-        description: |
-          Ngày nhận hàng từ đối tác, định dạng `yyyy-MM-dd`.
-      pickup_timeslot:
-        type: object
-        description: |
-          Khung thời gian nhận hàng
-
-          ***Lưu ý:*** Các khung giờ hợp lệ
-    
-          * "09:00" - "12:00"
-          
-          * "09:00" - "18:00"
-          
-          * "09:00" - "22:00"
-          
-          * "12:00" - "15:00"
-          
-          * "15:00" - "18:00"
-          
-          * "18:00" - "22:00"
-        allOf:
-          - $ref: './Timeslot.yaml'
-      pickup_approx_volume:
-        type: string
-        enum:
-          - Full-Van Load
-          - Half-Van Load
-          - Larger than Van Load
-          - Less than 10 Parcels
-          - Less than 3 Parcels
-          - Trolley Required
-        default:
-          Less than 3 Parcels
-      pickup_instructions:
-        type: string
-        description: |
-          Hướng dẫn cho tài xế đến lấy hàng
-      delivery_start_date:
-        type: string
-        pattern: '^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'
-        description: |
-          Ngày bắt đầu của khoảng thời gian giao hàng, định dạng `yyyy-MM-dd`.
-          
-          Ví dụ: Đối với các đơn đặt hàng tiêu chuẩn mất 3 ngày, nếu
-          `delivery_start_date` là vào `2017-02-10`, Ninja Van sẽ
-          cố gắng giao hàng trong khoảng thời gian từ `2017-02-10` đến `2017-02-12`.
-
-          Hệ thống sẽ tự động điều chỉnh thành ngày khả dụng gần nhất khi ngày được truyền vào không hợp lệ (cuối tuần hoặc ngày lễ). Hãy kiểm tra ngày `delivery_start_date` trong kết quả trả về.
-      delivery_timeslot:
-        type: object
-        description: |
-          Khung thời gian giao hàng
-
-          ***Lưu ý:*** Các khung giờ hợp lệ
-    
-          * "09:00" - "12:00"
-          
-          * "09:00" - "18:00"
-          
-          * "09:00" - "22:00"
-          
-          * "12:00" - "15:00"
-          
-          * "15:00" - "18:00"
-          
-          * "18:00" - "22:00"
-        allOf:
-          - $ref: './Timeslot.yaml'
-      delivery_instructions:
-        type: string
-        description: |
-          Hướng dẫn cho tài xế đi giao hàng
-      items:
-        type: array
-        items:
-          type: object
-      allow_weekend_delivery:
-        type: boolean
-        default: true
-        description: |
-          Cho biết có nên giao hàng vào cuối tuần hay không.
-      cash_on_delivery:
-        type: number
-        format: double
-        minimum: 0
-        description: |
-          Số tiền COD. Nếu bằng 0 thì không thu tiền COD.
-      insured_value:
-        type: number
-        format: double
-        minimum: 0
-        description: |
-          Giá trị bảo hiểm mong muốn của kiện hàng
-      dimensions:
-        type: object
-        description: |
-          Kích thước của kiện hàng, được dùng để tính phí vận chuyển.
-          
-          
-          ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja Van để xem bạn nên gửi thuộc tính kích thước nào.
+      Nếu địa chỉ lấy hàng không được cung cấp, hệ thống sẽ dựa vào địa chỉ lấy hàng mặc định được cài đặt trong tài khoản của đối tác.
+    allOf:
+      - $ref: './ParcelJob.yaml'
 example:
   service_type: Parcel
   service_level: Standard

@@ -1,0 +1,24 @@
+type: object
+description: Biểu diễn đơn hàng dành cho Marketplace
+properties:
+  marketplace:
+    required:
+      - seller_company_name
+      - seller_id
+    type: object
+    properties:
+      seller_id:
+        maxLength: 255
+        minLength: 1
+        pattern: '^([a-zA-Z0-9]+[-])*[a-zA-Z0-9]+$'
+        type: string
+        description: |
+          Mã người bán hàng. Nếu nền tảng của đối tác là một marketplace và bạn đang tạo đơn đặt hàng cho người bán trên nền tảng của mình, hãy nhập ID người bán vào trường này.
+      seller_company_name:
+        maxLength: 255
+        minLength: 2
+        type: string
+        description: Tên công ty của người bán.
+    description: Bắt buộc cung cấp nếu `service_type` là `Marketplace`.
+allOf:
+  - $ref: './Order.yaml'

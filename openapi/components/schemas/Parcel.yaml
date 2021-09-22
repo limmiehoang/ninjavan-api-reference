@@ -1,0 +1,4 @@
+type: object
+description: Parcel service representation
+allOf:
+  - $ref: './Order.yaml'

@@ -1,13 +1,26 @@
 post:
   tags:
     - APIs
-  summary: Tạo đơn hàng (v4.1 - latest)
+  summary: Tạo đơn hàng
   description: |
-    Gửi yêu cầu tạo đơn đến Ninja Van thông qua API. Sau khi đơn hàng được tạo thành công, hệ thống sẽ trả về tất cả thông tin tương ứng của đơn hàng.
+    Tạo một đơn dặt hàng mới đến Ninja Van thông qua API. Sau khi đơn hàng được tạo thành công, hệ thống sẽ trả về tất cả thông tin tương ứng của đơn hàng.
     
     Để tránh đơn bị trùng mã, hãy gửi kèm `requested_tracking_number` trong payload, hệ thống sẽ sử dụng trường này để sinh mã vận đơn.
     
     Nếu tài khoản đối tác được cấu hình *prefixless* (không chứa prefix) cho mã vận đơn thì trường `requested_tracking_number` là **bắt buộc**.
+
+    Nếu tài khoản đối tác có cấu hình prefix, API sẽ nối prefix của bạn với `requested_tracking_number` để tạo mã vận đơn.
+    Trường hợp không cung cấp `requested_tracking_number`, API sẽ tự động tạo một mã ngẫu nhiên và nối vào prefix của bạn.
+
+    Tổng độ dài của `tracking_number` cũng được kiểm tra dựa trên cài đặt. Độ dài mặc định cho `tracking_number` thường là khoảng 18 ký tự.
+    Nếu số `requested_tracking_number` quá ngắn, API sẽ tự động đệm giá trị `0` vào giữa.
+    Vui lòng kiểm tra với chúng tôi nếu đối tác có bất kỳ câu hỏi nào liên quan đến cài đặt tài khoản của mình.
+
+    Đối với nền tảng Marketplace, thông tin `marketplace` là bắt buộc.
+    Với thông tin `seller_id`, API sẽ tự động tạo tài khoản Ninja Van mới cho người bán của bạn, _nếu_ `seller_id` chưa được đăng ký trước trong hệ thống của Ninja Van.
+
+    Đối với tài khoản Corporate, thông tin `corporate` là bắt buộc. Tài khoản Chi nhánh công ty (Corporate Branch) phải được tạo dưới Cơ quan quản lý công ty (Corporate HQ) trước khi có thể thực hiện yêu cầu tạo đơn hàng.
+    Với thông tin `branch_id`, API sẽ tạo các đơn đặt hàng cho Chi nhánh công ty được xác định bằng mã chi nhánh này.
   operationId: order
   parameters:
     - name: Authorization
@@ -16,47 +29,91 @@ post:
       schema:
         type: string
         example: Bearer <YOUR_ACCESS_TOKEN>
-      description: Xác thực bằng cách gửi kèm mã `access_token` được trả về trong API tạo mã xác thực.
-  responses:
-    '200':
-      description: Đơn hàng tạo thành công
-      headers:
-        x-nv-request-id:
-          description: Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja Van devsupport.
-          schema:
-            type: string
-            format: uuid
-      content:
-        application/json:
-          schema:
-            $ref: ../components/schemas/OrderResponse.yaml
-    '401':
-      description: Mã xác thực không hợp lệ
-      headers:
-        x-nv-request-id:
-          description: Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja Van devsupport.
-          schema:
-            type: string
-            format: uuid
-    '400':
-      description: Yêu cầu bị từ chối do tham số gửi lên không hợp lệ
-      headers:
-        x-nv-request-id:
-          description: Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja Van devsupport.
-          schema:
-            type: string
-            format: uuid
-    '500':
-      description: Tạo đơn hàng không thành công do lỗi từ server
-      headers:
-        x-nv-request-id:
-          description: Mã tham chiếu request. Dùng để gửi kèm khi có thắc mắc đến Ninja Van devsupport.
-          schema:
-            type: string
-            format: uuid
+      description: Vui lòng gửi kèm mã `access_token` được trả về trong API tạo mã xác thực.
   requestBody:
     content:
       application/json:
         schema:
           $ref: ../components/schemas/Order.yaml
     required: true
+  responses:
+    '200':
+      description: Đơn hàng tạo thành công.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - required:
+                  - tracking_number
+                properties:
+                  tracking_number:
+                    type: string
+                    description: |
+                      Mã vận đơn của hệ thống Ninja Van
+                    pattern: '^([a-zA-Z0-9]+[-])*[a-zA-Z0-9]+$'
+                  service_type:
+                    type: string
+                    description: |
+                      Loại hình vận chuyển, là chỉ dẫn để thông báo cho Ninja Van biết những công việc cần làm cho đơn hàng này.
+                  service_level:
+                    type: string
+                    description: |
+                      Dịch vụ vận chuyển mong muốn
+                  requested_tracking_number:
+                    type: string
+                    pattern: '^([a-zA-Z0-9]+[-])*[a-zA-Z0-9]+$'
+                    minLength: 9
+                    description: Mã đơn hàng mong muốn
+                  reference:
+                    type: object
+                    description: |
+                      Thông tin tham chiếu, thông tin này sẽ được bao gồm trong webhooks để đối chiếu với đơn hàng trên hệ thống đối tác, và có thể dùng làm tham số khi truy xuất đơn đặt hàng qua API của Ninja Van.
+                    properties:
+                      merchant_order_number:
+                        type: string
+                        description: Định danh đơn hàng trên hệ thống đối tác
+                        maxLength: 255
+                  from:
+                    type: object
+                    description: |
+                      Đối tượng `from` được dùng như:
+                      
+                      * Thông tin liên hệ để thông báo người gửi khi có cập nhật đơn hàng
+                      
+                      * Thông tin địa chỉ gửi hàng in trên nhãn bưu kiện
+                    allOf:
+                      - $ref: '../components/schemas/Address.yaml'
+                  to:
+                    type: object
+                    description: |
+                      Đối tượng `to` được dùng như nơi giao hàng và:
+                      
+                      * Thông tin liên hệ để thông báo người nhận khi có cập nhật đơn hàng
+                      
+                      * Thông tin địa chỉ giao hàng in trên nhãn bưu kiện
+                    allOf:
+                      - $ref: '../components/schemas/Address.yaml'
+                  parcel_job:
+                    type: object
+                    description: |
+                      Chi tiết thông tin nhận hàng và giao hàng.               
+                    allOf:
+                      - $ref: '../components/schemas/ParcelJob.yaml'
+    '401':
+      description: Mã xác thực không hợp lệ.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/ErrorResponse.yaml'
+    '400':
+      description: Yêu cầu bị từ chối do tham số gửi lên không hợp lệ.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/ErrorResponse.yaml'
+    '500':
+      description: Tạo đơn hàng không thành công do lỗi từ server.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/ErrorResponse.yaml'

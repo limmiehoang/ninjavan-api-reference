@@ -1,0 +1,36 @@
+required:
+  - error
+type: object
+properties:
+  error:
+    required:
+      - request_id
+    type: object
+    properties:
+      code:
+        type: string
+        description: Mã tham chiếu lỗi.
+      request_id:
+        type: string
+        description: Định danh yêu cầu để theo dõi lỗi.
+      title:
+        type: string
+        description: Tiêu đề lỗi thân thiện với người dùng.
+      message:
+        type: string
+        description: Thông báo lỗi thân thiện với người dùng.
+      details:
+        type: array
+        items:
+          required:
+            - field
+            - message
+            - reason
+          type: object
+          properties:
+            reason:
+              type: string
+            field:
+              type: string
+            message:
+              type: string

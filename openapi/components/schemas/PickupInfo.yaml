@@ -1,0 +1,82 @@
+allOf:
+  - $ref: './ParcelJob.yaml'
+  - type: object
+  - required:
+    - pickup_service_type
+    - pickup_service_level
+    - pickup_date
+    - pickup_timeslot
+    properties:
+      pickup_service_type:
+        type: string
+        enum:
+          - Scheduled
+          - On-Demand
+        default:
+          Scheduled
+        description: |
+          Dịch vụ lấy hàng
+          
+          ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja Van để biết bạn có thể dùng Pickup Service Type nào.
+      pickup_service_level:
+        type: string
+        enum:
+          - Standard
+          - Premium
+        default:
+          Standard
+        description: |
+          ***Lưu ý:*** Không áp dụng cho các đơn hàng có dịch vụ pickup `On-Demand`.
+      pickup_address:
+        type: object
+        description: |
+          Địa chỉ lấy hàng
+        allOf:
+          - $ref: './Address.yaml'
+      pickup_address_id:    
+        type: string
+        pattern: '^([a-zA-Z0-9]+[-])*[a-zA-Z0-9]+$'
+        description: |
+          Mã địa chỉ lấy hàng đã được lưu trong hệ thống Ninja Van.
+        minLength: 1  
+        maxLength: 64
+      pickup_date:
+        type: string
+        pattern: '^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'
+        description: |
+          Ngày lấy hàng từ đối tác, định dạng `yyyy-MM-dd`.
+      pickup_timeslot:
+        type: object
+        description: |
+          Khung thời gian lấy hàng
+
+          ***Lưu ý:*** Các khung giờ hợp lệ
+
+          * "09:00" - "12:00"
+          
+          * "09:00" - "18:00"
+          
+          * "09:00" - "22:00"
+          
+          * "12:00" - "15:00"
+          
+          * "15:00" - "18:00"
+          
+          * "18:00" - "22:00"
+        allOf:
+          - $ref: './Timeslot.yaml'
+      pickup_approx_volume:
+        type: string
+        enum:
+          - Full-Van Load
+          - Half-Van Load
+          - Larger than Van Load
+          - Less than 10 Parcels
+          - Less than 3 Parcels
+          - Trolley Required
+        default:
+          Less than 3 Parcels
+      pickup_instructions:
+        type: string
+        description: |
+          Hướng dẫn cho tài xế đến lấy hàng

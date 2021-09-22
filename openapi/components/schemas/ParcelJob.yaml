@@ -1,0 +1,103 @@
+type: object
+required:
+- is_pickup_required
+- delivery_timeslot
+- delivery_start_date
+properties:
+  delivery_start_date:
+    type: string
+    pattern: '^([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$'
+    description: |
+      Ngày bắt đầu của khoảng thời gian giao hàng, định dạng `yyyy-MM-dd`.
+      
+      Ví dụ: Đối với các đơn đặt hàng tiêu chuẩn mất 3 ngày, nếu
+      `delivery_start_date` là vào `2017-02-10`, Ninja Van sẽ
+      cố gắng giao hàng trong khoảng thời gian từ `2017-02-10` đến `2017-02-12`.
+
+      Hệ thống sẽ tự động điều chỉnh thành ngày khả dụng gần nhất khi ngày được truyền vào không hợp lệ (cuối tuần hoặc ngày lễ). Hãy kiểm tra ngày `delivery_start_date` trong kết quả trả về.
+  delivery_timeslot:
+    type: object
+    description: |
+      Khung thời gian giao hàng
+
+      ***Lưu ý:*** Các khung giờ hợp lệ
+
+      * "09:00" - "12:00"
+      
+      * "09:00" - "18:00"
+      
+      * "09:00" - "22:00"
+      
+      * "12:00" - "15:00"
+      
+      * "15:00" - "18:00"
+      
+      * "18:00" - "22:00"
+    allOf:
+      - $ref: './Timeslot.yaml'
+  delivery_instructions:
+    type: string
+    description: |
+      Hướng dẫn cho tài xế đi giao hàng.
+  items:
+    type: array
+    items:
+      required:
+        - item_description
+      type: object
+      properties:
+        item_description:
+          type: string
+          description: Mô tả sản phẩm
+        quantity:
+          type: number
+          description: Tổng số lượng
+        is_dangerous_good:
+          type: boolean
+          description: Khai báo hàng nguy hiểm vận chuyển hàng không
+      description: Chi tiết sản phẩm bên trong kiện hàng.
+  allow_weekend_delivery:
+    type: boolean
+    default: true
+    description: |
+      Cho biết có nên giao hàng vào cuối tuần hay không.
+  cash_on_delivery:
+    type: number
+    format: double
+    minimum: 0
+    description: |
+      Số tiền COD. Nếu bằng 0 thì không thu tiền COD.
+  insured_value:
+    type: number
+    format: double
+    minimum: 0
+    description: |
+      Giá trị bảo hiểm mong muốn của kiện hàng.
+  dimensions:
+    type: object
+    description: |
+      Kích thước của kiện hàng, được dùng để tính phí vận chuyển.
+      
+      
+      ***Lưu ý:*** Vui lòng kiểm tra với người đại diện Sales của Ninja Van để xem bạn nên gửi thuộc tính kích thước nào.
+  is_pickup_required: 
+    type: boolean
+    description: |
+      Cho biết có cần đến lấy hàng tại kho của đối tác hay không.
+
+      Nếu được chỉ định là có lấy hàng (`true`), hệ thống sẽ kiểm tra xem đã có yêu cầu đặt trước lấy hàng với thông tin sau hay chưa:
+      * Ngày lấy hàng (`pickup_date`)
+      * Địa chỉ lấy hàng (`parcel_job.pickup_address` hoặc `from.address`)
+
+      Nếu chưa tồn tại thì hệ thống sẽ tạo một yêu cầu lấy hàng mới.
+
+      Xin lưu ý rằng các trường sau đây phải được cung cấp nếu yêu cầu lấy hàng là `Scheduled`
+      * `pickup_date`
+      * `pickup_timeslot`
+      * `pickup_approx_volume`
+    default: false
+discriminator:
+  propertyName: is_pickup_required
+  mapping:
+    'false': './NoPickupInfo.yaml'
+    'true': './PickupInfo.yaml'

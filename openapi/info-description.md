@@ -17,14 +17,14 @@ Ninja Van yêu cầu đối tác lưu lại mã xác thực vào bộ nhớ cach
 
 ***LƯU Ý:*** Thời gian hiệu lực của mã xác thực là không cố định và có thể thay đổi theo thời gian.
 
-## API tạo đơn và huỷ đơn
+## API tạo đơn và API huỷ đơn
 * Đối tác được khuyến khích thử lại các yêu cầu tạo đơn hàng NẾU có lỗi ***HTTP 5xx*** trả về từ API.
 * Nếu gặp lỗi ***HTTP 4xx***, hãy lưu lại kết quả trả về cho mục đích gỡ lỗi của bạn.
 * Vui lòng ***KHÔNG*** thử lại cùng một yêu cầu tạo đơn hàng mà chưa sửa lỗi được chỉ định trong phản hồi.
 
-## API tạo vận đơn
-Nếu đối tác cần quyền truy cập vào API tạo vận đơn, xin lưu ý rằng quyền truy cập vào API này là có điều kiện.
-    Đối tác ***phải*** lưu lại vận đơn vào bộ nhớ cache sau khi tạo để tránh gọi quá nhiều đến API vận đơn.
+## API in nhãn đơn hàng
+Nếu đối tác cần quyền truy cập vào API in nhãn đơn hàng, xin lưu ý rằng quyền truy cập vào API này cần yêu cầu thêm.
+Đối tác ***phải*** lưu lại nhãn đơn hàng vào bộ nhớ cache sau khi tạo để tránh gọi quá nhiều đến API này.
 
 # Cách xin quyền truy cập Production
 Ninja Van cần thực hiện đánh giá tích hợp trước khi cấp cho đối tác quyền truy cập vào API trên Production.

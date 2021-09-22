@@ -6,6 +6,15 @@ post:
     Yêu cầu mã xác thực Oauth Bearer mới.
 
     Đối tác cần có mã ID và mã khoá cho yêu cầu này. Mã ID và mã khoá có thể được truy xuất từ dashboard của đối tác, trong phần cài đặt API.
+
+    ***Hãy đảm bảo quy trình sau đây trong quá trình tích hợp***:
+    * Tạo mã xác thực.
+    * Lưu mã trong bộ nhớ database hoặc bộ nhớ cache và đồng thời lưu lại thời gian hết hạn.
+    * Đính kèm mã xác thực dưới dạng bearer trong mọi yêu cầu API đến Ninja Van.
+        * Nghĩa là giá trị trong `Authorization` HTTP header là `Bearer <ACCESS TOKEN>`.
+    * 5 phút trước khi đến thời gian hết hạn hoặc nếu yêu cầu đến Ninja Van API được phản hồi với lỗi ***HTTP 401***, hãy tạo mã xác thực mới.
+
+    ***LƯU Ý:*** Thời gian hiệu lực của mã xác thực là không cố định và có thể thay đổi theo thời gian.
   operationId: token
   requestBody:
     content:
@@ -34,7 +43,7 @@ post:
     required: true
   responses:
     '200':
-      description: Tạo mã xác thực thành công
+      description: Tạo mã xác thực thành công.
       content:
         application/json:
           schema:
@@ -67,3 +76,15 @@ post:
               expires: 1630369629
               expires_in: 43200
               token_type: bearer
+    '400':
+      description: Tạo mã xác thực không thành công do lỗi từ yêu cầu.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/ErrorResponse.yaml'
+    '500':
+      description: Tạo mã xác thực không thành công do lỗi từ server.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/ErrorResponse.yaml'

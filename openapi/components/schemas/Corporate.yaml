@@ -1,0 +1,17 @@
+type: object
+description: Biểu diễn đơn hàng dành cho Corporate
+properties:
+  corporate:
+    required:
+      - branch_id
+    type: object
+    properties:
+      branch_id:
+        maxLength: 255
+        minLength: 1
+        pattern: '^([a-zA-Z0-9]+[-])*[a-zA-Z0-9]+$'
+        type: string
+        description: Mã chi nhánh công ty
+    description: Bắt buộc cung cấp nếu `service_type` là `Corporate`.
+allOf:
+  - $ref: './Order.yaml'
